@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="./node_modules/three/examples/js/libs/ammo.wasm.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/kripken/ammo.js@HEAD/builds/ammo.wasm.js"></script>
+ <script type="importmap">
+     {
+       "imports": {
+           "three": "./node_modules/three/build/three.module.js",
+           "three/addons/": "./node_modules/three/examples/jsm/",
+           "cannon-es": "./node_modules/cannon-es/dist/cannon-es.js",
+           "cannon-es-debugger": "./node_modules/cannon-es-debugger/dist/cannon-es-debugger.js"
+           
+       }
+     }
+   </script>
+
+    <link rel="stylesheet" href="style.css">
+    <title>PROJECTS</title>
+</head>
+<body id="projects">
+    <script>
+
+  
+
+               
+        
+        function mazeGen(maze, traversed)
+        {
+           
+            let xpos = 1;
+            let ypos = 1;
+            //Sets the first cell to the marker indicating a starting point.
+             //maze[xpos][ypos] = 'O';
+             //maze[xpos] = maze[xpos].substring(0,ypos) + "O" + maze[xpos].substring(ypos+1, 21)
+            //Calls the recursion function to generate maze.
+             recur(maze, traversed, xpos, ypos);
+            //After the recursion function is finished, marks the destination
+            // maze[19][19] = 'X';
+            maze[19] = maze[19].substring(0,19) + "X" + "#"
+            //Prints the finished maze
+     
+            maze.forEach(element => { 
+                        document.getElementById("maze").value+=element + "\n";
+        })
+    }
+        function recur(maze, traversed, xpos, ypos)
+        {
+            //Generates a random number between 0 and 3 inclusive.
+            let randomnumber = Math.floor(Math.random()*4);
+            console.log(randomnumber);
+            //This loop runs while there are any empty spaces surrounding the coordinates in said location
+            while(traversed[xpos-1][ypos-1] == 't'  || traversed[xpos][ypos-1] == 't'  ||
+            traversed[xpos+1][ypos-1] == 't'  || traversed[xpos-1][ypos] == 't'  || traversed[xpos][ypos] == 't'  ||
+            traversed[xpos+1][ypos] == 't'  || traversed[xpos-1][ypos+1] == 't'  || traversed[xpos][ypos+1] == 't'  || traversed[xpos+1][ypos+1] == 't' ){
+            //Determines a random direction in which to draw the path(either up, down, left, or right)
+            randomnumber = Math.floor(Math.random()*4);
+            //If the random number is zero, try to draw a path left
+            if(randomnumber == 0)
+            {
+                if((xpos >1) && (traversed[xpos-2][ypos] == 't' ))
+                {
+                    //Take the x position to the wall
+                    xpos--;
+                    //Tear down said wall and mark as visited
+                    //maze[xpos][ypos] = ' ';
+                    maze[xpos] = maze[xpos].substring(0,ypos) + " " + maze[xpos].substring(ypos+1, 21)
+                    //Calls the recursion function for the next cell
+                   // traversed[xpos][ypos]= ' ';
+                    traversed[xpos] = traversed[xpos].substring(0,ypos) + " " + traversed[xpos].substring(ypos+1, 21)
+                    //Set coordinates to interior of next cell
+                    xpos--;
+                    //Mark cell as visited and as path as the wall is certain to be empty
+                    //traversed[xpos][ypos]= ' ';
+                    traversed[xpos] = traversed[xpos].substring(0,ypos) + " " + traversed[xpos].substring(ypos+1, 21)
+                    //Calls this function(recursion) for the next cell
+                    recur(maze,traversed, xpos, ypos);
+                    //Resets any changes made to the ypos value in the previous statements within this if statement so the loop can continue to check the same cell until all the surrounding areas are full.
+                    xpos+=2;
+                }
+                //If drawing the path would create a loop(according to Prim's algorithm), leave the wall and mark the area as traversed.
+                else
+                {
+                    traversed[xpos-1] = traversed[xpos-1].substring(0,ypos) + '#' + traversed[xpos-1].substring(ypos+1, 21)
+                }
+            }
+            //If the random number is one, try to draw the path right
+            else if(randomnumber == 1)
+            {
+                if((xpos <19) && (traversed[xpos+2][ypos] == 't' ))
+                {
+    
+                    //Take the x position to the wall
+                    xpos++;
+                    //Tear down said wall and mark as visited
+                    //maze[xpos][ypos] = ' ';
+                    maze[xpos] = maze[xpos].substring(0,ypos) + " " + maze[xpos].substring(ypos+1, 21)
+                    //traversed[xpos][ypos]= ' ';
+                    traversed[xpos] = traversed[xpos].substring(0,ypos) + " " + traversed[xpos].substring(ypos+1, 21)
+                    //Set coordinates to interior of next cell
+                    xpos++;
+                    //Mark cell as visited and as path as the wall is certain to be empty
+                   // traversed[xpos][ypos]= ' ';
+                   traversed[xpos] = traversed[xpos].substring(0,ypos) + " " + traversed[xpos].substring(ypos+1, 21)
+                    //Calls this function(recursion) for the next cell
+                    recur(maze,traversed, xpos, ypos);
+                    //Resets any changes made to the ypos value in the previous statements within this if statement so the loop can continue to check the same cell until all the surrounding areas are full.
+                    xpos-=2;
+                }
+                //If drawing the path would create a loop(according to Prim's algorithm), leave the wall and mark the area as traversed.
+                else
+                {
+                    traversed[xpos+1] = traversed[xpos+1].substring(0,ypos) + '#' + traversed[xpos+1].substring(ypos+1, 21)
+                }
+            }
+            //If the random number is two, try to draw the path up
+            else if(randomnumber == 2)
+            {
+                if((ypos >1) && (traversed[xpos][ypos-2] == 't' ))
+                {
+                    //Take the y position to the wall
+                    ypos--;
+                    //Tear down said wall and mark as visited
+                    maze[xpos] = maze[xpos].substring(0,ypos) + " " + maze[xpos].substring(ypos+1, 21)
+                    traversed[xpos] = traversed[xpos].substring(0,ypos) + " " + traversed[xpos].substring(ypos+1, 21)
+                    //Set coordinates to interior of next cell
+                    ypos--;
+                    //Mark cell as visited and as path as the wall is certain to be empty
+                    traversed[xpos] = traversed[xpos].substring(0,ypos) + " " + traversed[xpos].substring(ypos+1, 21)
+                    //Calls this function(recursion) for the next cell
+                    recur(maze,traversed, xpos, ypos);
+                    //Resets any changes made to the ypos value in the previous statements within this if statement so the loop can continue to check the same cell until all the surrounding areas are full.
+                    ypos+=2;
+                }
+                //If drawing the path would create a loop(according to Prim's algorithm), leave the wall and mark the area as traversed.
+                else
+                {
+                    traversed[xpos] = traversed[xpos].substring(0,ypos-1) + '#' + traversed[xpos].substring(ypos, 21)
+                }
+            }
+            //If the random number is three, try to draw the path down
+            else
+            {
+                if((ypos <19) && (traversed[xpos][ypos+2] == 't' ))
+                {
+                    //Take the y position to the wall
+                    ypos++;
+                    //Tear down said wall and mark as visited
+                    maze[xpos] = maze[xpos].substring(0,ypos) + " " + maze[xpos].substring(ypos+1, 21)
+                    traversed[xpos] = traversed[xpos].substring(0,ypos) + " " + traversed[xpos].substring(ypos+1, 21)
+                    //Set coordinates to interior of next cell
+                    ypos++;
+                    //Mark cell as visited and as path as the wall is certain to be empty
+                    traversed[xpos] = traversed[xpos].substring(0,ypos) + " " + traversed[xpos].substring(ypos+1, 21)
+                    //Calls this function(recursion) for the next cell
+                    recur(maze,traversed, xpos, ypos);
+                    //Resets any changes made to the ypos value in the previous statements within this if statement so the loop can continue to check the same cell until all the surrounding areas are full.
+                    ypos-=2;
+                }
+                //If drawing the path would create a loop(according to Prim's algorithm), leave the wall and mark the area as traversed.
+                else
+                {
+    
+                    traversed[xpos] = traversed[xpos].substring(0,ypos+1) + '#' + traversed[xpos].substring(ypos+2, 21)
+                }
+            }
+        }
+       
+    }
+    
+    
+    function gen()  {
+        document.getElementById("maze").value="";
+    
+    let m = [
+    '#####################',
+    '#O# # # # # # # # # #',
+    '#####################',
+    '# # # # # # # # # # #',
+    '#####################',
+    '# # # # # # # # # # #',
+    '#####################',
+    '# # # # # # # # # # #',
+    '#####################',
+    '# # # # # # # # # # #',
+    '#####################',
+    '# # # # # # # # # # #',
+    '#####################',
+    '# # # # # # # # # # #',
+    '#####################',
+    '# # # # # # # # # # #',
+    '#####################',
+    '# # # # # # # # # # #',
+    '#####################',
+    '# # # # # # # # # # #',
+    '#####################'
+    ]
+    
+    //Keeps track of areas that have already been traversed and/or never will be traversed
+    let t =
+    ['#####################',
+    '#Otttttttttttttttttt#',
+    '#t#t#t#t#t#t#t#t#t#t#',
+    '#ttttttttttttttttttt#',
+    '#t#t#t#t#t#t#t#t#t#t#',
+    '#ttttttttttttttttttt#',
+    '#t#t#t#t#t#t#t#t#t#t#',
+    '#ttttttttttttttttttt#',
+    '#t#t#t#t#t#t#t#t#t#t#',
+    '#ttttttttttttttttttt#',
+    '#t#t#t#t#t#t#t#t#t#t#',
+    '#ttttttttttttttttttt#',
+    '#t#t#t#t#t#t#t#t#t#t#',
+    '#ttttttttttttttttttt#',
+    '#t#t#t#t#t#t#t#t#t#t#',
+    '#ttttttttttttttttttt#',
+    '#t#t#t#t#t#t#t#t#t#t#',
+    '#ttttttttttttttttttt#',
+    '#t#t#t#t#t#t#t#t#t#t#',
+    '#ttttttttttttttttttt#',
+    '#####################'];
+    mazeGen(m, t);
+    }
+
+     
+   
+       
+    </script>
+
+<nav>
+    <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="artwork.html">Artwork</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="contact.html">Contact</a></li>
+    </ul>
+</nav>
+<div >
+   
+    <h1>Projects</h1>
+    
+    <p>In 2020, I wrote a program in C to generate mazes using Prim's Algorithm.</p>
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/3bhwxSzpBdY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+    </iframe>
+    <p>Of course, watching me run code through a video isn't as fun as running it yourself. That's why I ported that same code over to javascript. You can run
+        the program yourself right here right now. No need to download a compiler, ide, and my source code from github.
+    </p>
+    <textarea  type="text" title="this" id="maze" name="maz" rows="21" cols="21" value="THIS"></textarea>
+  
+    <button id="Generate" onclick="gen()">Generate Maze</button>
+   
+
+
+</div>
+<div style="color: black;">
+    <p>If we want to take this one step further, I can create a random maze that is not only playable, but 3D!<br>
+        Controls:<br>
+        W - Tilt Forward<br>
+        S- Tilt Backward<br>
+        A - Tilt left<br>
+        D -Tilt Right<br>
+    </p>
+    <iframe src="game.html" width="1706" height="960" totle="Maze Game 3D"></iframe>
+</div>
+<footer>Copyright</footer>
+
+
+</body>
+</html>
