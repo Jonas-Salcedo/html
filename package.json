@@ -4,5 +4,23 @@
     "cannon-es-debugger": "^1.0.0",
     "three": "^0.146.0",
     "three.js": "^0.77.0"
-  }
+  },
+  "name": "html",
+  "description": "Here is a simple readme",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fudgenuggets12/html.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fudgenuggets12/html/issues"
+  },
+  "homepage": "https://github.com/fudgenuggets12/html#readme"
 }
