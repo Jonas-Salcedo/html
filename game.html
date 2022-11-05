@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+       <script src="./node_modules/three/examples/js/libs/ammo.wasm.js"></script>
+       <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+       <script src="https://cdn.jsdelivr.net/gh/kripken/ammo.js@HEAD/builds/ammo.wasm.js"></script>
+        <script type="importmap">
+            {
+              "imports": {
+                  "three": "./node_modules/three/build/three.module.js",
+                  "three/addons/": "./node_modules/three/examples/jsm/",
+                  "cannon-es": "./node_modules/cannon-es/dist/cannon-es.js",
+                  "cannon-es-debugger": "./node_modules/cannon-es-debugger/dist/cannon-es-debugger.js"
+                  
+              }
+            }
+          </script>
+        <title>HELLO</title>
+      
+    
+    </head>
+    <body>
+    
+    <script type="module">
+                 import * as THREE  from 'three';
+    import * as CANNON from 'cannon-es';
+    import * as BufferGeometryUtils from './node_modules/three/examples/jsm/utils/BufferGeometryUtils.js'
+    import {OrbitControls} from './node_modules/three/examples/jsm/controls/OrbitControls.js';
+    import CannonDebugger from 'cannon-es-debugger';
+          
+  var va = 0.00001;
+  var yva = 0.00001;
+
+  function mazeGen(maze, traversed)
+        {
+            
+           
+            let xpos = 1;
+            let ypos = 1;
+            //Sets the first cell to the marker indicating a starting point.
+             //maze[xpos][ypos] = 'O';
+             //maze[xpos] = maze[xpos].substring(0,ypos) + "O" + maze[xpos].substring(ypos+1, 21)
+            //Calls the recursion function to generate maze.
+             recur(maze, traversed, xpos, ypos);
+            //After the recursion function is finished, marks the destination
+            // maze[19][19] = 'X';
+            maze[19] = maze[19].substring(0,19) + "X" + "#"
+            //Prints the finished maze
+     
+
+    }
+        function recur(maze, traversed, xpos, ypos)
+        {
+            //Generates a random number between 0 and 3 inclusive.
+            let randomnumber = Math.floor(Math.random()*4);
+            console.log(randomnumber);
+            //This loop runs while there are any empty spaces surrounding the coordinates in said location
+            while(traversed[xpos-1][ypos-1] == 't'  || traversed[xpos][ypos-1] == 't'  ||
+            traversed[xpos+1][ypos-1] == 't'  || traversed[xpos-1][ypos] == 't'  || traversed[xpos][ypos] == 't'  ||
+            traversed[xpos+1][ypos] == 't'  || traversed[xpos-1][ypos+1] == 't'  || traversed[xpos][ypos+1] == 't'  || traversed[xpos+1][ypos+1] == 't' ){
+            //Determines a random direction in which to draw the path(either up, down, left, or right)
+            randomnumber = Math.floor(Math.random()*4);
+            //If the random number is zero, try to draw a path left
+            if(randomnumber == 0)
+            {
+                if((xpos >1) && (traversed[xpos-2][ypos] == 't' ))
+                {
+                    //Take the x position to the wall
+                    xpos--;
+                    //Tear down said wall and mark as visited
+                    //maze[xpos][ypos] = ' ';
+                    maze[xpos] = maze[xpos].substring(0,ypos) + " " + maze[xpos].substring(ypos+1, 21)
+                    //Calls the recursion function for the next cell
+                   // traversed[xpos][ypos]= ' ';
+                    traversed[xpos] = traversed[xpos].substring(0,ypos) + " " + traversed[xpos].substring(ypos+1, 21)
+                    //Set coordinates to interior of next cell
+                    xpos--;
+                    //Mark cell as visited and as path as the wall is certain to be empty
+                    //traversed[xpos][ypos]= ' ';
+                    traversed[xpos] = traversed[xpos].substring(0,ypos) + " " + traversed[xpos].substring(ypos+1, 21)
+                    //Calls this function(recursion) for the next cell
+                    recur(maze,traversed, xpos, ypos);
+                    //Resets any changes made to the ypos value in the previous statements within this if statement so the loop can continue to check the same cell until all the surrounding areas are full.
+                    xpos+=2;
+                }
+                //If drawing the path would create a loop(according to Prim's algorithm), leave the wall and mark the area as traversed.
+                else
+                {
+                    traversed[xpos-1] = traversed[xpos-1].substring(0,ypos) + '#' + traversed[xpos-1].substring(ypos+1, 21)
+                }
+            }
+            //If the random number is one, try to draw the path right
+            else if(randomnumber == 1)
+            {
+                if((xpos <19) && (traversed[xpos+2][ypos] == 't' ))
+                {
+    
+                    //Take the x position to the wall
+                    xpos++;
+                    //Tear down said wall and mark as visited
+                    //maze[xpos][ypos] = ' ';
+                    maze[xpos] = maze[xpos].substring(0,ypos) + " " + maze[xpos].substring(ypos+1, 21)
+                    //traversed[xpos][ypos]= ' ';
+                    traversed[xpos] = traversed[xpos].substring(0,ypos) + " " + traversed[xpos].substring(ypos+1, 21)
+                    //Set coordinates to interior of next cell
+                    xpos++;
+                    //Mark cell as visited and as path as the wall is certain to be empty
+                   // traversed[xpos][ypos]= ' ';
+                   traversed[xpos] = traversed[xpos].substring(0,ypos) + " " + traversed[xpos].substring(ypos+1, 21)
+                    //Calls this function(recursion) for the next cell
+                    recur(maze,traversed, xpos, ypos);
+                    //Resets any changes made to the ypos value in the previous statements within this if statement so the loop can continue to check the same cell until all the surrounding areas are full.
+                    xpos-=2;
+                }
+                //If drawing the path would create a loop(according to Prim's algorithm), leave the wall and mark the area as traversed.
+                else
+                {
+                    traversed[xpos+1] = traversed[xpos+1].substring(0,ypos) + '#' + traversed[xpos+1].substring(ypos+1, 21)
+                }
+            }
+            //If the random number is two, try to draw the path up
+            else if(randomnumber == 2)
+            {
+                if((ypos >1) && (traversed[xpos][ypos-2] == 't' ))
+                {
+                    //Take the y position to the wall
+                    ypos--;
+                    //Tear down said wall and mark as visited
+                    maze[xpos] = maze[xpos].substring(0,ypos) + " " + maze[xpos].substring(ypos+1, 21)
+                    traversed[xpos] = traversed[xpos].substring(0,ypos) + " " + traversed[xpos].substring(ypos+1, 21)
+                    //Set coordinates to interior of next cell
+                    ypos--;
+                    //Mark cell as visited and as path as the wall is certain to be empty
+                    traversed[xpos] = traversed[xpos].substring(0,ypos) + " " + traversed[xpos].substring(ypos+1, 21)
+                    //Calls this function(recursion) for the next cell
+                    recur(maze,traversed, xpos, ypos);
+                    //Resets any changes made to the ypos value in the previous statements within this if statement so the loop can continue to check the same cell until all the surrounding areas are full.
+                    ypos+=2;
+                }
+                //If drawing the path would create a loop(according to Prim's algorithm), leave the wall and mark the area as traversed.
+                else
+                {
+                    traversed[xpos] = traversed[xpos].substring(0,ypos-1) + '#' + traversed[xpos].substring(ypos, 21)
+                }
+            }
+            //If the random number is three, try to draw the path down
+            else
+            {
+                if((ypos <19) && (traversed[xpos][ypos+2] == 't' ))
+                {
+                    //Take the y position to the wall
+                    ypos++;
+                    //Tear down said wall and mark as visited
+                    maze[xpos] = maze[xpos].substring(0,ypos) + " " + maze[xpos].substring(ypos+1, 21)
+                    traversed[xpos] = traversed[xpos].substring(0,ypos) + " " + traversed[xpos].substring(ypos+1, 21)
+                    //Set coordinates to interior of next cell
+                    ypos++;
+                    //Mark cell as visited and as path as the wall is certain to be empty
+                    traversed[xpos] = traversed[xpos].substring(0,ypos) + " " + traversed[xpos].substring(ypos+1, 21)
+                    //Calls this function(recursion) for the next cell
+                    recur(maze,traversed, xpos, ypos);
+                    //Resets any changes made to the ypos value in the previous statements within this if statement so the loop can continue to check the same cell until all the surrounding areas are full.
+                    ypos-=2;
+                }
+                //If drawing the path would create a loop(according to Prim's algorithm), leave the wall and mark the area as traversed.
+                else
+                {
+    
+                    traversed[xpos] = traversed[xpos].substring(0,ypos+1) + '#' + traversed[xpos].substring(ypos+2, 21)
+                }
+            }
+        }
+       
+    }
+    let m = [
+    '#####################',
+    '#O# # # # # # # # # #',
+    '#####################',
+    '# # # # # # # # # # #',
+    '#####################',
+    '# # # # # # # # # # #',
+    '#####################',
+    '# # # # # # # # # # #',
+    '#####################',
+    '# # # # # # # # # # #',
+    '#####################',
+    '# # # # # # # # # # #',
+    '#####################',
+    '# # # # # # # # # # #',
+    '#####################',
+    '# # # # # # # # # # #',
+    '#####################',
+    '# # # # # # # # # # #',
+    '#####################',
+    '# # # # # # # # # # #',
+    '#####################'
+    ]
+    
+    //Keeps track of areas that have already been traversed and/or never will be traversed
+    let t =
+    ['#####################',
+    '#Otttttttttttttttttt#',
+    '#t#t#t#t#t#t#t#t#t#t#',
+    '#ttttttttttttttttttt#',
+    '#t#t#t#t#t#t#t#t#t#t#',
+    '#ttttttttttttttttttt#',
+    '#t#t#t#t#t#t#t#t#t#t#',
+    '#ttttttttttttttttttt#',
+    '#t#t#t#t#t#t#t#t#t#t#',
+    '#ttttttttttttttttttt#',
+    '#t#t#t#t#t#t#t#t#t#t#',
+    '#ttttttttttttttttttt#',
+    '#t#t#t#t#t#t#t#t#t#t#',
+    '#ttttttttttttttttttt#',
+    '#t#t#t#t#t#t#t#t#t#t#',
+    '#ttttttttttttttttttt#',
+    '#t#t#t#t#t#t#t#t#t#t#',
+    '#ttttttttttttttttttt#',
+    '#t#t#t#t#t#t#t#t#t#t#',
+    '#ttttttttttttttttttt#',
+    '#####################'];
+    mazeGen(m, t);
+
+
+
+
+    
+  
+ 
+     
+     
+     const scene = new THREE.Scene();
+     const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+     const renderer = new THREE.WebGLRenderer();
+     renderer.setSize(window.innerWidth, window.innerHeight);
+     renderer.shadowMap.enabled=true;
+    
+     const directional = new THREE.DirectionalLight(0xffffff, 0.5);
+     directional.position.set(0,0,10);
+     directional.castShadow = true;
+     directional.target.position.set(-5,0,0);
+     
+     scene.add(directional);
+     scene.add(directional.target);
+     document.body.appendChild(renderer.domElement);
+     const orbit = new OrbitControls(camera, renderer.domElement);
+     const physicsWorld = new CANNON.World({
+        gravity: new CANNON.Vec3(0,0, -9.82)
+     });
+     
+     var mesh = new THREE.Mesh();
+     var cd = new CannonDebugger(scene, physicsWorld, {});
+     camera.position.z=15;
+    camera.position.x=-3;
+    const geometry = new THREE.SphereGeometry(0.25,32,16);
+    const material = new THREE.MeshPhongMaterial({color: 0xff0000});
+    const ball = new THREE.Mesh(geometry, material);
+     ball.position.x = -9;
+    ball.position.y = 9;
+    ball.position.z = 10;
+  
+    const ballBody = new CANNON.Body({
+        mass:1,
+        shape: new CANNON.Sphere(0.25),
+    });
+    var bod = new CANNON.Body({
+     mass: 2205,
+
+     });
+    ballBody.position.set(9,-9,9);
+    physicsWorld.addBody(ballBody);
+     setup();
+     animate();
+   
+   function setup(){
+  
+   
+    
+     const grid = [];
+     const gridBody = [];
+     const geometr = new THREE.BufferGeometry();
+
+
+
+
+
+
+     
+     var tl = 0;
+     var finalGeo = new THREE.BufferGeometry();
+     for(var y = 0; y<21; y++){
+        const line = [];
+        const lineBody = [];
+     for(var x = 0; x<21; x++){
+
+     const geo = new THREE.BoxGeometry(1,1,1);
+     lineBody.push(new CANNON.Body({
+        type: CANNON.Body.STATIC,
+        shape: new CANNON.Box(new CANNON.Vec3(0.5,0.5,0.5)),
+     }));
+    
+     if(m[y].charAt(x) == ' ')
+            {
+
+                geo.translate((x-10),(y-10),-1);
+                lineBody[x].position.set((x-10),(y-10),-1);
+                tl=-1
+            }
+            else
+            {
+                geo.translate((x-10),(y-10),0);
+               lineBody[x].position.set((x-10),(y-10), 0);
+               tl=0
+            }
+            line.push(geo);
+      
+    //physicsWorld.addBody(lineBody[x]);
+     
+        var shapea = new CANNON.Box(new CANNON.Vec3(0.5,0.5,0.5))
+       
+        bod.addShape(shapea, new CANNON.Vec3((x-10),(y-10), tl), new CANNON.Quaternion());
+
+
+     
+     }
+     grid.push(line);
+     gridBody.push(lineBody);
+    }
+   /* const mg = THREE.BufferGeometryUtils.mergeBufferGeometries(grid, false);*/
+    const materia = new THREE.MeshPhongMaterial({color: 0x00ff00});
+    const list2 = [];
+    for(var j = 0; j<21; j++)
+    {
+    list2.push(BufferGeometryUtils.mergeBufferGeometries(grid[j], false));
+    
+    }
+    finalGeo = BufferGeometryUtils.mergeBufferGeometries(list2, false);
+
+    mesh = new THREE.Mesh(finalGeo, materia);
+    bod.type=CANNON.Body.STATIC;
+    //scene.add(mesi);
+    
+    physicsWorld.addBody(bod);
+
+
+    //p.addMesh(ball);
+    scene.add(ball);
+    scene.add(mesh);
+    
+
+
+  
+  
+
+     
+
+    
+
+   
+     document.body.addEventListener("keydown", (event) =>
+     {
+        if(event.key == 'w' || event.key == 'W')
+        {
+           va+=0.001;
+        }
+        else if(event.key == 's' || event.key == 'S')
+        {
+            va-=0.001;
+        }
+        else if(event.key == 'd' || event.key == 'D')
+        {
+            yva-=0.001;
+        }
+        else if(event.key == 'a' || event.key == 'A')
+        {
+            yva+=0.001;
+        }
+
+     }
+     );
+    
+     
+    }
+     function animate()
+     {
+        physicsWorld.fixedStep();
+        // cd.update();
+         ball.position.copy(ballBody.position);
+         mesh.position.copy(bod.position);
+         bod.quaternion.setFromEuler((-Math.PI/2)*va,(-Math.PI/2)*yva,0);
+         mesh.quaternion.copy(bod.quaternion);
+        requestAnimationFrame( animate );
+        render();
+       
+
+
+
+
+
+       
+     }
+     function render()
+     {
+        renderer.render( scene, camera );
+   
+
+     }
+     
+
+
+
+
+                    
+
+
+    </script>
+    </body>
+</html>

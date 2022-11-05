@@ -1,0 +1,106 @@
+*{
+    box-sizing: border-box;
+
+}
+
+body{
+    position:absolute;
+    width:100%;
+    height:auto;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: white;
+    color: white;
+
+ 
+ 
+
+   
+ 
+}
+
+video{
+    position:absolute;
+    z-index: -1;
+}
+nav{
+    z-index: 2;
+}
+h1{
+
+    font-weight: 100;
+    z-index: 2;
+}
+
+ul{
+    background-color: black;
+
+    z-index: 2;
+    
+}
+li{
+    float: left;
+    z-index: 2;
+}
+li a{
+    display: inline-block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none; z-index: 2;
+
+}
+li a:hover{
+    background-color: aqua;
+    z-index: 2;
+}
+
+ul{
+list-style-type: none;
+margin:0;
+padding:0;
+overflow:hidden;
+z-index: 2;
+}
+
+.active{
+    background-color:green;
+}
+.inactive{
+    background-color:black;
+}
+#home{
+    height:100%;
+    
+}
+#artwork{
+    background-color:black;
+    z-index: -1;
+}
+#reactMaze{
+    background-color: black;
+    width:100%;
+    z-index: 5;
+}
+div{
+    height:100%;
+    width:auto;
+    
+}
+#contact{
+
+  
+
+    background-image: url("pexels-pixabay-414628.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    z-index: -1;
+
+}
+#projects{
+    padding-bottom: 100%;
+    background-image: url("pexels-elvis-2528116.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    z-index: 1;
+    
+}
